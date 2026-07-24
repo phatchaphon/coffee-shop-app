@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// 0.1 ตารางประเภทวัตถุดิบ
+model IngredientCategory {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
+  ingredients Ingredient[]
+}
+
+// 0.2 ตารางประเภทเมนูสินค้า
+model ProductCategory {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[]
+}
+
+// 1. ตารางเมนูที่ขายหน้าร้าน
+model Product {
+  id         Int              @id @default(autoincrement())
+  name       String
+  price      Float
+  categoryId Int?             // เชื่อมกับหมวดหมู่
+  category   ProductCategory? @relation(fields: [categoryId], references: [id])
+  recipes    Recipe[]
+}
+
+// 2. ตารางวัตถุดิบหลังร้าน
+model Ingredient {
+  id            Int                 @id @default(autoincrement())
+  name          String
+  unit          String              // เช่น กรัม, ml, ใบ
+  currentStock  Float               @default(0)
+  minAlertLevel Float               @default(0)
+  categoryId    Int?                // เชื่อมกับหมวดหมู่
+  category      IngredientCategory? @relation(fields: [categoryId], references: [id])
+
+  recipes       Recipe[]
+  transactions  StockTransaction[]
+}
+
+// 3. ตารางสูตรชง (ผูกเมนูกับวัตถุดิบ)
+model Recipe {
+  id           Int      @id @default(autoincrement())
+  productId    Int
+  ingredientId Int
+  amount       Float    // ปริมาณที่ใช้ต่อ 1 เสิร์ฟ
+
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, ingredientId]) // ป้องกันวัตถุดิบซ้ำในเมนูเดียวกัน และรองรับการทำ upsert
+}
+
+// 4. ตารางประวัติการเข้า-ออกของสต็อก
+model StockTransaction {
+  id           Int      @id @default(autoincrement())
+  ingredientId Int
+  type         String   // IN (รับเข้า), OUT (ใช้ไป/ขาย), ADJUST (ปรับปรุงยอด)
+  amount       Float
+  note         String?
+  createdAt    DateTime @default(now())
+
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+}
