@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS & Inventory - จัดการเมนูสินค้า</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome สำหรับไอคอน -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 สำหรับแจ้งเตือนที่สวยงาม -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --success-hover: #059669;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --warning: #f59e0b;
+            --warning-hover: #d97706;
+            --purple: #8b5cf6;
+            --purple-hover: #7c3aed;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 8px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-main); 
+            margin: 0; 
+            padding: 30px 20px; 
+            color: var(--text-main); 
+        }
+
+        .container { 
+            max-width: 1050px; 
+            margin: 0 auto; 
+            background: var(--bg-card); 
+            padding: 30px; 
+            border-radius: var(--radius); 
+            box-shadow: var(--shadow); 
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-top: 0;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 { 
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main); 
+            margin-top: 0; 
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section { 
+            margin-bottom: 30px; 
+            padding-bottom: 25px; 
+            border-bottom: 1px solid var(--border); 
+        }
+
+        button { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 9px 16px; 
+            border-radius: var(--radius); 
+            cursor: pointer; 
+            font-size: 14px; 
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        button:hover { background: var(--primary-hover); }
+
+        .btn-success { background: var(--success); }
+        .btn-success:hover { background: var(--success-hover); }
+        
+        .btn-danger { background: var(--danger); }
+        .btn-danger:hover { background: var(--danger-hover); }
+        
+        .btn-warning { background: var(--warning); }
+        .btn-warning:hover { background: var(--warning-hover); }
+
+        .nav-links { 
+            margin-bottom: 30px; 
+            display: flex; 
+            gap: 8px; 
+            flex-wrap: wrap; 
+        }
+        
+        .nav-links a { 
+            background: #334155; 
+            color: white; 
+            padding: 9px 14px; 
+            text-decoration: none; 
+            border-radius: var(--radius); 
+            font-size: 13px; 
+            font-weight: 600; 
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        .nav-links a:hover { background: #1e293b; }
+        .nav-links a.active { background: var(--primary); }
+
+        .category-tag { 
+            background: #eff6ff; 
+            color: var(--primary); 
+            padding: 4px 10px; 
+            border-radius: 4px; 
+            font-size: 12px; 
+            font-weight: 600;
+            border: 1px solid #dbeafe;
+            display: inline-block;
+        }
+        
+        .category-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: #f8fafc; 
+            padding: 10px 16px; 
+            border: 1px solid var(--border); 
+            margin-bottom: 8px; 
+            border-radius: var(--radius); 
+        }
+
+        .empty-text {
+            color: var(--text-muted);
+            font-size: 14px;
+            text-align: center;
+            padding: 25px;
+        }
+
+        /* --- ตารางและการค้นหาขั้นสูง --- */
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 240px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            background: #fff;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-box input:focus {
+            border-color: var(--primary);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .per-page-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .per-page-box select {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            background: #fff;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: #fff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .action-btns { 
+            display: flex; 
+            gap: 6px; 
+        }
+
+        /* --- การแบ่งหน้า (Pagination) --- */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .pagination-info {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .pagination-buttons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .page-btn {
+            background: #fff;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        .page-btn:disabled {
+            background: #f8fafc;
+            color: #cbd5e1;
+            cursor: not-allowed;
+            border-color: var(--border);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1><i class="fa-solid fa-mug-hot" style="color: var(--primary);"></i> จัดการเมนูสินค้า</h1>
+    
+    <div class="nav-links">
+        <a href="index.html"><i class="fa-solid fa-house"></i> แดชบอร์ด</a>
+        <a href="ingredients.html"><i class="fa-solid fa-box"></i> จัดการวัตถุดิบ & รับเข้า</a>
+        <a href="products.html" class="active"><i class="fa-solid fa-mug-hot"></i> จัดการเมนูสินค้า</a>
+        <a href="recipes.html"><i class="fa-solid fa-flask"></i> ผูกสูตรชง</a>
+        <a href="history-in.html" style="background:#059669;"><i class="fa-solid fa-arrow-down-to-bracket"></i> ประวัติรับเข้า</a>
+        <a href="history-out.html" style="background:#d97706;"><i class="fa-solid fa-arrow-up-from-bracket"></i> ประวัติเบิกออก</a>
+    </div>
+
+    <!-- จัดการประเภทเมนู -->
+    <div class="section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2><i class="fa-solid fa-tags" style="color: var(--primary);"></i> จัดการประเภทเมนูสินค้า</h2>
+            <button class="btn-success" onclick="openCategoryModal()"><i class="fa-solid fa-plus"></i> เพิ่มประเภทเมนู</button>
+        </div>
+        <div id="categoryListDisplay"></div>
+    </div>
+
+    <!-- รายการเมนูทั้งหมด -->
+    <div class="section" style="border-bottom:none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+            <h2><i class="fa-solid fa-clipboard-list" style="color: var(--primary);"></i> รายการเมนูทั้งหมดในระบบ</h2>
+            <button class="btn-success" onclick="openProductModal()"><i class="fa-solid fa-plus"></i> เพิ่มเมนูสินค้าใหม่</button>
+        </div>
+
+        <!-- ชุดควบคุมการค้นหาและกำหนดจำนวนแสดงผลต่อหน้า -->
+        <div class="table-controls">
+            <div class="search-box">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="searchInput" placeholder="ค้นหาชื่อเมนู หรือประเภทสินค้า..." oninput="handleSearch()">
+            </div>
+            <div class="per-page-box">
+                <span>แสดง</span>
+                <select id="perPageSelect" onchange="handlePerPageChange()">
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+                <span>รายการ</span>
+            </div>
+        </div>
+
+        <!-- ตารางข้อมูลเมนูสินค้า -->
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 8%;">#</th>
+                        <th style="width: 30%;">ชื่อเมนูสินค้า</th>
+                        <th style="width: 25%;">ประเภทเมนู</th>
+                        <th style="width: 22%;">ราคาขาย</th>
+                        <th style="width: 15%; text-align: right;">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
+                    <tr>
+                        <td colspan="5" class="empty-text">กำลังโหลด...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- แถบแบ่งหน้า Pagination -->
+        <div class="pagination-container">
+            <div class="pagination-info" id="paginationInfo">แสดง 0 ถึง 0 จากทั้งหมด 0 รายการ</div>
+            <div class="pagination-buttons" id="paginationButtons"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_URL = 'http://localhost:3000';
+    let categories = [];
+    let allProducts = [];       // เก็บข้อมูลทั้งหมดจากเซิร์ฟเวอร์
+    let filteredProducts = [];  // ข้อมูลหลังผ่านการกรอง (Search)
+    let currentPage = 1;        // หน้าปัจจุบัน
+    let itemsPerPage = 10;      // จำนวนรายการต่อหน้า
+
+    async function initPage() {
+        await loadCategories();
+        await loadProducts();
+    }
+
+    // --- จัดการประเภทเมนู ---
+    async function loadCategories() {
+        try {
+            const res = await fetch(`${API_URL}/api/product-categories`);
+            const data = await res.json();
+            const catDisplay = document.getElementById('categoryListDisplay');
+            catDisplay.innerHTML = '';
+
+            if (!Array.isArray(data)) return;
+            categories = data;
+
+            if(categories.length === 0) {
+                catDisplay.innerHTML = '<div class="empty-text">ยังไม่มีประเภทเมนูสินค้า</div>';
+                return;
+            }
+
+            categories.forEach(c => {
+                catDisplay.innerHTML += `
+                    <div class="category-item">
+                        <span><i class="fa-solid fa-tag" style="color: var(--primary); margin-right: 6px;"></i> <b>${c.name}</b></span>
+                        <div class="action-btns">
+                            <button class="btn-warning" onclick="openEditCategory(${c.id}, '${c.name}')"><i class="fa-solid fa-pen"></i> แก้ไข</button>
+                            <button class="btn-danger" onclick="promptDeleteCategory(${c.id})"><i class="fa-solid fa-trash"></i> ลบ</button>
+                        </div>
+                    </div>`;
+            });
+        } catch (e) {
+            console.error('โหลดประเภทเมนูไม่สำเร็จ', e);
+        }
+    }
+
+    async function openCategoryModal() {
+        const { value: name } = await Swal.fire({
+            title: 'เพิ่มประเภทเมนูสินค้า',
+            input: 'text',
+            inputLabel: 'ชื่อประเภท',
+            inputPlaceholder: 'เช่น เมนูกาแฟ, ชาและนม',
+            showCancelButton: true,
+            confirmButtonText: 'ยืนยันบันทึก',
+            cancelButtonText: 'ยกเลิก',
+            confirmButtonColor: '#2563eb',
+            cancelButtonColor: '#94a3b8',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'กรุณากรอกชื่อประเภท!';
+                }
+            }
+        });
+
+        if (name) {
+            saveCategory(null, name);
+        }
+    }
+
+    async function openEditCategory(id, currentName) {
+        const { value: name } = await Swal.fire({
+            title: 'แก้ไขประเภทเมนูสินค้า',
+            input: 'text',
+            inputLabel: 'ชื่อประเภท',
+            inputValue: currentName,
+            showCancelButton: true,
+            confirmButtonText: 'ยืนยันบันทึก',
+            cancelButtonText: 'ยกเลิก',
+            confirmButtonColor: '#2563eb',
+            cancelButtonColor: '#94a3b8',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'กรุณากรอกชื่อประเภท!';
+                }
+            }
+        });
+
+        if (name) {
+            saveCategory(id, name);
+        }
+    }
+
+    async function saveCategory(id, name) {
+        const url = id ? `${API_URL}/api/product-categories/${id}` : `${API_URL}/api/product-categories`;
+        const method = id ? 'PUT' : 'POST';
+
+        try {
+            const res = await fetch(url, {
+                method: method, 
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ name })
+            });
+
+            if(res.ok) {
+                Swal.fire({
+                    icon: 'success',
+                    title: id ? 'แก้ไขประเภทเมนูสำเร็จ!' : 'เพิ่มประเภทเมนูสำเร็จ!',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                loadCategories();
+                loadProducts();
+            } else {
+                const data = await res.json();
+                Swal.fire('เกิดข้อผิดพลาด', data.error || 'บันทึกไม่สำเร็จ', 'error');
+            }
+        } catch (e) {
+            Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', 'error');
+        }
+    }
+
+    async function promptDeleteCategory(id) {
+        const result = await Swal.fire({
+            title: '⚠️ ยืนยันการลบข้อมูล',
+            text: 'คุณต้องการลบประเภทเมนูนี้ใช่หรือไม่? (เมนูสินค้าที่อยู่ภายใต้อาจได้รับผลกระทบ)',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: 'ยืนยันลบ',
+            cancelButtonText: 'ยกเลิก'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const res = await fetch(`${API_URL}/api/product-categories/${id}`, { method: 'DELETE' });
+                if(res.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ลบข้อมูลเรียบร้อยแล้ว',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    loadCategories();
+                    loadProducts();
+                } else {
+                    const data = await res.json();
+                    Swal.fire('ลบไม่สำเร็จ', data.error || 'เกิดข้อผิดพลาด', 'error');
+                }
+            } catch (e) {
+                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', 'error');
+            }
+        }
+    }
+
+    // --- จัดการเมนูสินค้าพร้อมระบบตาราง ค้นหา และแบ่งหน้า ---
+    async function loadProducts() {
+        try {
+            const res = await fetch(`${API_URL}/api/products`);
+            const products = await res.json();
+            
+            if (!Array.isArray(products)) {
+                allProducts = [];
+            } else {
+                allProducts = products;
+            }
+            
+            applyFilterAndPagination();
+        } catch (error) {
+            console.error('โหลดเมนูไม่สำเร็จ:', error);
+            document.getElementById('productTableBody').innerHTML = `<tr><td colspan="5" class="empty-text" style="color: var(--danger);">ไม่สามารถโหลดข้อมูลเมนูสินค้าได้</td></tr>`;
+        }
+    }
+
+    function handleSearch() {
+        currentPage = 1; // รีเซ็ตกลับไปหน้า 1 เมื่อพิมพ์ค้นหา
+        applyFilterAndPagination();
+    }
+
+    function handlePerPageChange() {
+        itemsPerPage = parseInt(document.getElementById('perPageSelect').value);
+        currentPage = 1; // รีเซ็ตกลับไปหน้า 1 เมื่อเปลี่ยนจำนวนรายการต่อหน้า
+        applyFilterAndPagination();
+    }
+
+    function applyFilterAndPagination() {
+        const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+
+        // 1. กรองข้อมูล (Filtering)
+        filteredProducts = allProducts.filter(p => {
+            const catName = (p.ProductCategory ? p.ProductCategory.name : 'ไม่ระบุประเภท').toLowerCase();
+            const prodName = (p.name || '').toLowerCase();
+            return prodName.includes(searchTerm) || catName.includes(searchTerm);
+        });
+
+        // 2. คำนวณหน้าทั้งหมด
+        const totalItems = filteredProducts.length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
+        }
+
+        // 3. ตัดข้อมูลเฉพาะหน้าที่กำลังแสดง (Pagination Slicing)
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const paginatedData = filteredProducts.slice(startIndex, endIndex);
+
+        // 4. แสดงผลลงตาราง
+        renderTable(paginatedData, startIndex, totalItems);
+        
+        // 5. เรนเดอร์ปุ่มตัวเลขแบ่งหน้า
+        renderPaginationControls(totalPages);
+    }
+
+    function renderTable(data, startIndex, totalItems) {
+        const tbody = document.getElementById('productTableBody');
+        tbody.innerHTML = '';
+
+        if (data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="empty-text">ไม่พบข้อมูลเมนูสินค้าในระบบ</td></tr>`;
+            return;
+        }
+
+        data.forEach((p, index) => {
+            const catName = p.ProductCategory ? p.ProductCategory.name : 'ไม่ระบุประเภท';
+            const itemNumber = startIndex + index + 1;
+            const formattedPrice = Number(p.price).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            tbody.innerHTML += `
+                <tr>
+                    <td style="color: var(--text-muted); font-weight: 500;">${itemNumber}</td>
+                    <td><b>${p.name}</b></td>
+                    <td><span class="category-tag">${catName}</span></td>
+                    <td><span style="color: var(--primary); font-weight: 600;">${formattedPrice} บาท</span></td>
+                    <td style="text-align: right;">
+                        <div class="action-btns" style="justify-content: flex-end;">
+                            <button class="btn-warning" onclick="openEditProduct(${p.id}, '${p.name.replace(/'/g, "\\'")}', ${p.categoryId || 'null'}, ${p.price})"><i class="fa-solid fa-pen"></i> แก้ไข</button>
+                            <button class="btn-danger" onclick="promptDeleteProduct(${p.id})"><i class="fa-solid fa-trash"></i> ลบ</button>
+                        </div>
+                    </td>
+                </tr>`;
+        });
+    }
+
+    function renderPaginationControls(totalPages) {
+        const infoEl = document.getElementById('paginationInfo');
+        const buttonsEl = document.getElementById('paginationButtons');
+
+        const totalItems = filteredProducts.length;
+        if (totalItems === 0) {
+            infoEl.textContent = 'แสดง 0 ถึง 0 จากทั้งหมด 0 รายการ';
+            buttonsEl.innerHTML = '';
+            return;
+        }
+
+        const startItem = (currentPage - 1) * itemsPerPage + 1;
+        const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+        infoEl.textContent = `แสดง ${startItem} ถึง ${endItem} จากทั้งหมด ${totalItems} รายการ`;
+
+        let buttonsHtml = '';
+
+        // ปุ่ม Previous
+        buttonsHtml += `<button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})"><i class="fa-solid fa-chevron-left"></i></button>`;
+
+        // สร้างปุ่มเลขหน้า (จำกัดไม่ให้ล้นกรณีหน้าเยอะเกินไป)
+        let maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        if (startPage > 1) {
+            buttonsHtml += `<button class="page-btn" onclick="changePage(1)">1</button>`;
+            if (startPage > 2) {
+                buttonsHtml += `<span style="padding: 6px 8px; color: var(--text-muted);">...</span>`;
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            buttonsHtml += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                buttonsHtml += `<span style="padding: 6px 8px; color: var(--text-muted);">...</span>`;
+            }
+            buttonsHtml += `<button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+        }
+
+        // ปุ่ม Next
+        buttonsHtml += `<button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})"><i class="fa-solid fa-chevron-right"></i></button>`;
+
+        buttonsEl.innerHTML = buttonsHtml;
+    }
+
+    function changePage(page) {
+        currentPage = page;
+        applyFilterAndPagination();
+    }
+
+    async function openProductModal() {
+        if (categories.length === 0) {
+            Swal.fire('แจ้งเตือน', 'กรุณาเพิ่มประเภทเมนูก่อนเพิ่มสินค้า', 'warning');
+            return;
+        }
+
+        const { value: formValues } = await Swal.fire({
+            title: 'เพิ่มเมนูสินค้าใหม่',
+            html:
+                '<div style="text-align: left; margin-bottom: 12px;"><label style="font-weight:600; font-size:13px; color: #1e293b; display: block; margin-bottom: 6px;">ชื่อเมนู:</label>' +
+                '<input id="swal-prodName" class="swal2-input" placeholder="เช่น เอสเพรสโซ่เย็น" style="margin: 0; width: 100%; box-sizing: border-box; font-family: Inter;"></div>' +
+                '<div style="text-align: left; margin-bottom: 12px;"><label style="font-weight:600; font-size:13px; color: #1e293b; display: block; margin-bottom: 6px;">ประเภทเมนู:</label>' +
+                '<select id="swal-prodCategory" class="swal2-input" style="margin: 0; width: 100%; box-sizing: border-box; height: 42px; font-family: Inter;">' +
+                categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('') +
+                '</select></div>' +
+                '<div style="text-align: left;"><label style="font-weight:600; font-size:13px; color: #1e293b; display: block; margin-bottom: 6px;">ราคาขาย (บาท):</label>' +
+                '<input id="swal-prodPrice" type="number" class="swal2-input" placeholder="55" style="margin: 0; width: 100%; box-sizing: border-box; font-family: Inter;"></div>',
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'ยืนยันบันทึก',
+            cancelButtonText: 'ยกเลิก',
+            confirmButtonColor: '#2563eb',
+            cancelButtonColor: '#94a3b8',
+            preConfirm: () => {
+                const name = document.getElementById('swal-prodName').value;
+                const categoryId = document.getElementById('swal-prodCategory').value;
+                const price = document.getElementById('swal-prodPrice').value;
+                if (!name || !price || !categoryId) {
+                    Swal.showValidationMessage('กรุณากรอกข้อมูลให้ครบถ้วน');
+                }
+                return { name, categoryId, price };
+            }
+        });
+
+        if (formValues) {
+            saveProduct(null, formValues.name, formValues.categoryId, formValues.price);
+        }
+    }
+
+    async function openEditProduct(id, currentName, currentCategoryId, currentPrice) {
+        let categoryOptionsHtml = categories.map(c => 
+            `<option value="${c.id}" ${c.id === currentCategoryId ? 'selected' : ''}>${c.name}</option>`
+        ).join('');
+
+        const { value: formValues } = await Swal.fire({
+            title: 'แก้ไขเมนูสินค้า',
+            html:
+                '<div style="text-align: left; margin-bottom: 12px;"><label style="font-weight:600; font-size:13px; color: #1e293b; display: block; margin-bottom: 6px;">ชื่อเมนู:</label>' +
+                `<input id="swal-prodName" class="swal2-input" value="${currentName}" style="margin: 0; width: 100%; box-sizing: border-box; font-family: Inter;"></div>` +
+                '<div style="text-align: left; margin-bottom: 12px;"><label style="font-weight:600; font-size:13px; color: #1e293b; display: block; margin-bottom: 6px;">ประเภทเมนู:</label>' +
+                `<select id="swal-prodCategory" class="swal2-input" style="margin: 0; width: 100%; box-sizing: border-box; height: 42px; font-family: Inter;">${categoryOptionsHtml}</select></div>` +
+                '<div style="text-align: left;"><label style="font-weight:600; font-size:13px; color: #1e293b; display: block; margin-bottom: 6px;">ราคาขาย (บาท):</label>' +
+                `<input id="swal-prodPrice" type="number" class="swal2-input" value="${currentPrice}" style="margin: 0; width: 100%; box-sizing: border-box; font-family: Inter;"></div>`,
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'ยืนยันบันทึก',
+            cancelButtonText: 'ยกเลิก',
+            confirmButtonColor: '#2563eb',
+            cancelButtonColor: '#94a3b8',
+            preConfirm: () => {
+                const name = document.getElementById('swal-prodName').value;
+                const categoryId = document.getElementById('swal-prodCategory').value;
+                const price = document.getElementById('swal-prodPrice').value;
+                if (!name || !price || !categoryId) {
+                    Swal.showValidationMessage('กรุณากรอกข้อมูลให้ครบถ้วน');
+                }
+                return { name, categoryId, price };
+            }
+        });
+
+        if (formValues) {
+            saveProduct(id, formValues.name, formValues.categoryId, formValues.price);
+        }
+    }
+
+    async function saveProduct(id, name, categoryId, price) {
+        const url = id ? `${API_URL}/api/products/${id}` : `${API_URL}/api/products`;
+        const method = id ? 'PUT' : 'POST';
+
+        try {
+            const res = await fetch(url, {
+                method: method, 
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ name, categoryId: Number(categoryId), price })
+            });
+
+            if(res.ok) {
+                Swal.fire({
+                    icon: 'success',
+                    title: id ? 'แก้ไขเมนูสินค้าสำเร็จ!' : 'เพิ่มเมนูสินค้าสำเร็จ!',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                loadProducts();
+            } else {
+                Swal.fire('เกิดข้อผิดพลาด', 'บันทึกไม่สำเร็จ', 'error');
+            }
+        } catch (e) {
+            Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', 'error');
+        }
+    }
+
+    async function promptDeleteProduct(id) {
+        const result = await Swal.fire({
+            title: '⚠️ ยืนยันการลบข้อมูล',
+            text: 'คุณต้องการลบเมนูสินค้านี้ใช่หรือไม่?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: 'ยืนยันลบ',
+            cancelButtonText: 'ยกเลิก'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const res = await fetch(`${API_URL}/api/products/${id}`, { method: 'DELETE' });
+                if(res.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ลบข้อมูลเรียบร้อยแล้ว',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    loadProducts();
+                } else {
+                    const data = await res.json();
+                    Swal.fire('ลบไม่สำเร็จ', data.error || 'เกิดข้อผิดพลาด', 'error');
+                }
+            } catch (e) {
+                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', 'error');
+            }
+        }
+    }
+
+    initPage();
+</script>
+</body>
+</html>
