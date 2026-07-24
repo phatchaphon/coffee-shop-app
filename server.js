@@ -664,7 +664,7 @@ app.get('/api/stock-transactions', async (req, res) => {
 });
 
 // เริ่มต้นรัน Server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 19075;
 app.listen(PORT, () => {
   console.log(`🚀 Server & Frontend running at http://localhost:${PORT}`);
 });
