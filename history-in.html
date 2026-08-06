@@ -261,16 +261,16 @@
 </div>
 
 <script>
-    const API_URL = 'https://coffee-shop-backend-0rnz.onrender.com';
     let allData = [];
     let filteredData = [];
     let currentPage = 1;
     let itemsPerPage = 20;
 
-    async function loadHistoryIn() {
+    function loadHistoryIn() {
         try {
-            const res = await fetch(`${API_URL}/api/history/in`);
-            allData = await res.json();
+            // ดึงข้อมูลประวัติรับเข้าจาก localStorage (หากยังไม่มีให้ใช้ Array ว่าง)
+            const storedData = localStorage.getItem('coffee_history_in');
+            allData = storedData ? JSON.parse(storedData) : [];
             
             if (!Array.isArray(allData)) allData = [];
             
