@@ -3,560 +3,444 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POS & Inventory - แดชบอร์ดภาพรวม</title>
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Dashboard - ระบบจัดการร้านกาแฟ</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome สำหรับไอคอน -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SweetAlert2 CDN -->
+    <!-- SweetAlert2 สำหรับแจ้งเตือน -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --success: #10b981;
-            --success-hover: #059669;
-            --danger: #ef4444;
-            --danger-hover: #dc2626;
-            --warning: #f59e0b;
-            --warning-hover: #d97706;
-            --bg-main: #f8fafc;
-            --bg-card: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --radius: 8px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --primary: #4A3525;
+            --primary-light: #6F523B;
+            --accent: #D4A373;
+            --bg-color: #FDFBF7;
+            --card-bg: #FFFFFF;
+            --text-main: #2C221E;
+            --text-muted: #8C7A6B;
+            --border: #E6DFD5;
+            --success: #2D6A4F;
+            --danger: #BC4749;
         }
 
-        * { box-sizing: border-box; }
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: var(--bg-main); 
-            margin: 0; 
-            padding: 30px 20px; 
-            color: var(--text-main); 
-        }
-
-        .container { 
-            max-width: 1100px; 
-            margin: 0 auto; 
-            background: var(--bg-card); 
-            padding: 30px; 
-            border-radius: var(--radius); 
-            box-shadow: var(--shadow); 
-        }
-
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
+        body {
+            background-color: var(--bg-color);
             color: var(--text-main);
-            margin-top: 0;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        h2 { 
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-main); 
-            margin-top: 0; 
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .section { 
-            margin-bottom: 30px; 
-            padding-bottom: 25px; 
-            border-bottom: 1px solid var(--border); 
-        }
-        .section:last-child { 
-            border-bottom: none; 
-            margin-bottom: 0; 
-            padding-bottom: 0; 
-        }
-
-        button { 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            padding: 9px 16px; 
-            border-radius: var(--radius); 
-            cursor: pointer; 
-            font-size: 14px; 
-            font-weight: 500;
-            font-family: 'Inter', sans-serif;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: background 0.2s;
-        }
-        button:hover { background: var(--primary-hover); }
-
-        .btn-success { background: var(--success); }
-        .btn-success:hover { background: var(--success-hover); }
-        
-        .btn-danger { background: var(--danger); }
-        .btn-danger:hover { background: var(--danger-hover); }
-        
-        .btn-warning { background: var(--warning); }
-        .btn-warning:hover { background: var(--warning-hover); }
-
-        .btn-secondary { background: #64748b; color: white; }
-        .btn-secondary:hover { background: #475569; }
-
-        .nav-links { 
-            margin-bottom: 30px; 
-            display: flex; 
-            gap: 8px; 
-            flex-wrap: wrap; 
-        }
-        
-        .nav-links a { 
-            background: #334155; 
-            color: white; 
-            padding: 9px 14px; 
-            text-decoration: none; 
-            border-radius: var(--radius); 
-            font-size: 13px; 
-            font-weight: 600; 
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: background 0.2s;
-        }
-        .nav-links a:hover { background: #1e293b; }
-        .nav-links a.active { background: var(--primary); }
-
-        /* Dashboard Summary Cards Style */
-        .summary-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-            gap: 20px; 
-        }
-        
-        .summary-card { 
-            background: #ffffff; 
-            border: 1px solid var(--border); 
-            border-radius: var(--radius); 
-            padding: 20px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02); 
-            transition: transform 0.2s, box-shadow 0.2s; 
-        }
-        .summary-card:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); 
-        }
-        
-        .summary-card h3 { 
-            margin: 0 0 14px 0; 
-            font-size: 15px; 
-            font-weight: 600; 
-            color: var(--text-main); 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            border-bottom: 1px solid var(--border); 
-            padding-bottom: 10px; 
-        }
-        
-        .summary-list { 
-            list-style: none; 
-            padding: 0; 
-            margin: 0; 
-            max-height: 180px; 
-            overflow-y: auto; 
-        }
-        .summary-list::-webkit-scrollbar { width: 4px; }
-        .summary-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        
-        .summary-list li { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 8px 10px; 
-            margin-bottom: 6px; 
-            border-radius: 6px; 
-            background: #f8fafc; 
-            font-size: 13px; 
+        .card {
+            background-color: var(--card-bg);
             border: 1px solid var(--border);
-        }
-        .summary-empty { color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px 0; display: block; width: 100%; }
-        
-        .card-today { border-top: 4px solid #3b82f6; }
-        .card-week { border-top: 4px solid #f97316; }
-        .card-month { border-top: 4px solid #10b981; }
-
-        /* Stock List Styling */
-        #ingredientList { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 12px; 
-            padding: 0; 
-            margin: 0; 
-            list-style: none;
-        }
-        
-        #ingredientList li { 
-            background: #f8fafc; 
-            border: 1px solid var(--border); 
-            padding: 12px 16px; 
-            border-radius: var(--radius); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-left: 4px solid var(--primary); 
-        }
-        
-        #ingredientList li.low-stock { 
-            border-left-color: var(--danger); 
-            background: #fef2f2; 
-            border-color: #fee2e2; 
-        }
-        
-        .badge { 
-            background: var(--danger); 
-            color: white; 
-            padding: 2px 8px; 
-            border-radius: 20px; 
-            font-size: 11px; 
-            font-weight: 600; 
-            text-transform: uppercase; 
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(74, 53, 37, 0.05), 0 2px 4px -1px rgba(74, 53, 37, 0.03);
         }
 
-        /* Tables Styling */
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 12px; 
-            background: #fff; 
-            border-radius: var(--radius); 
-            overflow: hidden; 
-            border: 1px solid var(--border); 
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            transition: all 0.2s ease;
         }
-        th, td { 
-            padding: 12px 16px; 
-            text-align: left; 
-            font-size: 14px; 
-            border-bottom: 1px solid var(--border); 
+
+        .btn-primary:hover {
+            background-color: var(--primary-light);
         }
-        th { 
-            background: #f8fafc; 
-            font-weight: 600; 
-            color: var(--text-muted); 
+
+        .input-custom {
+            border: 1px solid var(--border);
+            background-color: #FAFAFA;
+            color: var(--text-main);
         }
-        tr:last-child td { border-bottom: none; }
-        
-        input[type="number"] { 
-            width: 110px; 
-            padding: 8px 12px; 
-            border: 1px solid var(--border); 
-            border-radius: 6px; 
-            font-size: 14px; 
-            font-family: 'Inter', sans-serif; 
-            outline: none; 
-            transition: border-color 0.2s; 
+
+        .input-custom:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(212, 163, 115, 0.15);
+            background-color: #FFFFFF;
         }
-        input[type="number"]:focus { 
-            border-color: var(--primary); 
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); 
+
+        /* ปรับแต่ง Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
-        
-        .action-container { margin-top: 20px; }
-        #message { margin-top: 12px; font-weight: 500; text-align: center; font-size: 14px; }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
     </style>
 </head>
-<body>
-<div class="container">
-    <h1><i class="fa-solid fa-chart-line" style="color: var(--primary);"></i> แดชบอร์ดภาพรวมร้าน</h1>
-    
-    <!-- Navigation -->
-    <div class="nav-links">
-        <a href="index.html" class="active"><i class="fa-solid fa-house"></i> แดชบอร์ด</a>
-        <a href="ingredients.html"><i class="fa-solid fa-box"></i> จัดการวัตถุดิบ & รับเข้า</a>
-        <a href="products.html"><i class="fa-solid fa-mug-hot"></i> จัดการเมนูสินค้า</a>
-        <a href="recipes.html"><i class="fa-solid fa-flask"></i> ผูกสูตรชง</a>
-        <a href="history-in.html" style="background:#059669;"><i class="fa-solid fa-arrow-down-to-bracket"></i> ประวัติรับเข้า</a>
-        <a href="history-out.html" style="background:#d97706;"><i class="fa-solid fa-arrow-up-from-bracket"></i> ประวัติเบิกออก</a>
-    </div>
+<body class="min-h-screen flex flex-col">
 
-    <!-- 📊 ส่วนสรุปยอดการใช้วัตถุดิบ -->
-    <div class="section">
-        <h2><i class="fa-solid fa-chart-pie" style="color: var(--primary);"></i> สรุปยอดการใช้วัตถุดิบ (ตัดสต็อกออก)</h2>
-        <div class="summary-grid">
-            <!-- วันนี้ -->
-            <div class="summary-card card-today">
-                <h3><span><i class="fa-solid fa-calendar-day" style="color: #3b82f6; margin-right: 6px;"></i> วันนี้</span> <span style="font-size: 12px; font-weight: normal; color: var(--text-muted);">Real-time</span></h3>
-                <ul id="todayList" class="summary-list">
-                    <li><span class="summary-empty">กำลังโหลดข้อมูล...</span></li>
-                </ul>
+    <!-- Navbar -->
+    <header class="bg-white border-b border-[#E6DFD5] sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-[#4A3525] flex items-center justify-center text-white shadow-md">
+                    <i class="fa-solid fa-mug-hot text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight text-[#4A3525]">Coffee Management</h1>
+                    <p class="text-xs text-[#8C7A6B]">ระบบจัดการสต็อกและสรุปยอดขาย</p>
+                </div>
             </div>
-
-            <!-- สัปดาห์นี้ -->
-            <div class="summary-card card-week">
-                <h3><span><i class="fa-solid fa-calendar-week" style="color: #f97316; margin-right: 6px;"></i> สัปดาห์นี้</span> <span style="font-size: 12px; font-weight: normal; color: var(--text-muted);">7 วันล่าสุด</span></h3>
-                <ul id="weekList" class="summary-list">
-                    <li><span class="summary-empty">กำลังโหลดข้อมูล...</span></li>
-                </ul>
-            </div>
-
-            <!-- เดือนนี้ -->
-            <div class="summary-card card-month">
-                <h3><span><i class="fa-solid fa-calendar-days" style="color: #10b981; margin-right: 6px;"></i> เดือนนี้</span> <span style="font-size: 12px; font-weight: normal; color: var(--text-muted);">เดือนปัจจุบัน</span></h3>
-                <ul id="monthList" class="summary-list">
-                    <li><span class="summary-empty">กำลังโหลดข้อมูล...</span></li>
-                </ul>
+            <div class="flex items-center space-x-3">
+                <button onclick="loadDashboardData()" class="px-3.5 py-2 text-sm font-medium rounded-lg border border-[#E6DFD5] hover:bg-[#FDFBF7] text-[#4A3525] transition flex items-center space-x-2">
+                    <i class="fa-solid fa-rotate text-xs"></i>
+                    <span class="hidden sm:inline">รีเฟรชข้อมูล</span>
+                </button>
             </div>
         </div>
-    </div>
+    </header>
 
-    <!-- สต็อกวัตถุดิบปัจจุบัน -->
-    <div class="section">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h2 style="margin: 0;"><i class="fa-solid fa-boxes-stacked" style="color: var(--primary);"></i> สถานะสต็อกวัตถุดิบปัจจุบัน</h2>
-            <button class="btn-secondary" onclick="loadDashboardData()" style="padding: 6px 12px; font-size: 13px;"><i class="fa-solid fa-rotate-right"></i> รีเฟรช</button>
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- Top Dashboard Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <!-- Card 1: ยอดขายวันนี้ -->
+            <div class="card p-5 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-[#8C7A6B]">ยอดขายวันนี้ (ประมาณการ)</p>
+                    <h3 id="summaryTotalSales" class="text-2xl font-bold mt-1 text-[#4A3525]">฿0.00</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-[#D4A373]/20 text-[#4A3525] flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+            </div>
+
+            <!-- Card 2: จำนวนออเดอร์/แก้วที่ขาย -->
+            <div class="card p-5 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-[#8C7A6B]">เครื่องดื่มที่ขายวันนี้</p>
+                    <h3 id="summaryTotalCups" class="text-2xl font-bold mt-1 text-[#4A3525]">0 แก้ว</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-[#D4A373]/20 text-[#4A3525] flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-glass-water"></i>
+                </div>
+            </div>
+
+            <!-- Card 3: สต็อกวัตถุดิบใกล้หมด -->
+            <div class="card p-5 flex items-center justify-between sm:col-span-2 lg:col-span-1">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-[#8C7A6B]">วัตถุดิบที่ต้องเติม (ต่ำกว่า 20%)</p>
+                    <h3 id="summaryLowStock" class="text-2xl font-bold mt-1 text-[#BC4749]">0 รายการ</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-[#BC4749]/10 text-[#BC4749] flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+            </div>
         </div>
-        <ul id="ingredientList"><li>กำลังโหลด...</li></ul>
-    </div>
 
-    <!-- สรุปยอดขายประจำวัน -->
-    <div class="section">
-        <h2><i class="fa-solid fa-cash-register" style="color: var(--primary);"></i> สรุปยอดขายประจำวัน (ปิดร้าน & ตัดสต็อก)</h2>
-        <div style="overflow-x: auto;">
-            <table id="salesTable">
-                <thead>
-                    <tr>
-                        <th>เมนูสินค้า</th>
-                        <th>ราคาขาย</th>
-                        <th>จำนวนแก้วที่ขายได้วันนี้</th>
-                    </tr>
-                </thead>
-                <tbody id="salesTableBody">
-                    <tr><td colspan="3" style="text-align: center; color: var(--text-muted);">กำลังโหลดเมนู...</td></tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="action-container">
-            <button class="btn-danger" style="width: 100%; padding: 12px; font-size: 15px; justify-content: center;" onclick="promptCloseShop()">
-                <i class="fa-solid fa-moon"></i> ยืนยันสรุปยอดขายและตัดสต็อกวัตถุดิบ
-            </button>
-            <div id="message"></div>
-        </div>
-    </div>
-</div>
-
-<script>
-    const API_URL = 'https://coffee-shop-backend-0rnz.onrender.com';
-    let productList = [];
-
-    async function loadDashboardData() {
-        await loadStockAndSales();
-        await loadUsageSummary();
-    }
-
-    async function loadStockAndSales() {
-        try {
-            // โหลดสต็อกวัตถุดิบ
-            const resIng = await fetch(`${API_URL}/api/ingredients`);
-            let ingredients = await resIng.json();
+        <!-- Layout แบ่ง 2 คอลัมน์ (ซ้าย: บันทึกปิดร้าน/ขาย, ขวา: สต็อกวัตถุดิบ) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            // ป้องกัน Error กรณีข้อมูลไม่ใช่ Array
-            if (!Array.isArray(ingredients)) {
-                ingredients = ingredients.data || ingredients.items || [];
-            }
+            <!-- Left Side: บันทึกการขายประจำวัน / ปิดร้าน (7 ส่วน) -->
+            <div class="lg:col-span-7 space-y-6">
+                <div class="card p-6">
+                    <div class="flex items-center justify-between pb-4 border-b border-[#E6DFD5]">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-[#4A3525]/10 text-[#4A3525] flex items-center justify-center">
+                                <i class="fa-solid fa-cash-register"></i>
+                            </div>
+                            <h2 class="text-lg font-bold text-[#4A3525]">บันทึกยอดขายประจำวัน (ปิดร้าน)</h2>
+                        </div>
+                        <span class="text-xs bg-[#D4A373]/20 text-[#4A3525] px-2.5 py-1 rounded-full font-medium">ระบบตัดสต็อกอัตโนมัติ</span>
+                    </div>
 
-            const listEl = document.getElementById('ingredientList');
-            listEl.innerHTML = '';
-            
-            if (ingredients.length === 0) {
-                listEl.innerHTML = '<li style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">ยังไม่มีข้อมูลวัตถุดิบ</li>';
-            } else {
-                ingredients.forEach(i => {
-                    const stockVal = i.currentStock !== undefined ? i.currentStock : (i.quantity !== undefined ? i.quantity : 0);
-                    const alertVal = i.minAlertLevel !== undefined ? i.minAlertLevel : 5;
-                    const isLow = stockVal <= alertVal;
-                    
-                    listEl.innerHTML += `
-                        <li class="${isLow ? 'low-stock' : ''}">
-                            <span style="font-weight: 600;"><i class="fa-solid fa-box" style="color: var(--primary); margin-right: 6px;"></i> ${i.name}</span>
-                            <span style="display: flex; align-items: center; gap: 8px;">
-                                ${stockVal} ${i.unit || ''} 
-                                ${isLow ? '<span class="badge">ใกล้หมด</span>' : ''}
-                            </span>
-                        </li>`;
+                    <p class="text-sm text-[#8C7A6B] mt-4">
+                        กรอกจำนวนแก้วที่ขายได้ของแต่ละเมนูในวันนี้ ระบบจะทำการหักวัตถุดิบตามสูตรที่ตั้งไว้และบันทึกยอดขายทันที
+                    </p>
+
+                    <!-- รายการสินค้าสำหรับกรอกจำนวนที่ขาย -->
+                    <div id="closeShopProductList" class="mt-5 space-y-3 max-h-[420px] overflow-y-auto pr-1">
+                        <!-- โหลดข้อมูลด้วย Javascript -->
+                        <div class="text-center py-8 text-[#8C7A6B]">
+                            <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
+                            <p>กำลังโหลดรายการเมนู...</p>
+                        </div>
+                    </div>
+
+                    <!-- ปุ่มยืนยันปิดร้าน -->
+                    <div class="mt-6 pt-4 border-t border-[#E6DFD5] flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div id="closeShopMsg" class="text-sm font-medium"></div>
+                        <button onclick="confirmCloseShop()" class="w-full sm:w-auto px-6 py-3 btn-primary font-medium rounded-xl shadow-sm flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-check-to-slot"></i>
+                            <span>ยืนยันปิดร้าน & ตัดสต็อก</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: สถานะวัตถุดิบปัจจุบัน (5 ส่วน) -->
+            <div class="lg:col-span-5 space-y-6">
+                <div class="card p-6">
+                    <div class="flex items-center justify-between pb-4 border-b border-[#E6DFD5]">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-[#4A3525]/10 text-[#4A3525] flex items-center justify-center">
+                                <i class="fa-solid fa-boxes-stacked"></i>
+                            </div>
+                            <h2 class="text-lg font-bold text-[#4A3525]">สต็อกวัตถุดิบปัจจุบัน</h2>
+                        </div>
+                        <span id="ingredientCountBadge" class="text-xs bg-[#E6DFD5] text-[#4A3525] px-2.5 py-1 rounded-full font-medium">0 รายการ</span>
+                    </div>
+
+                    <!-- ตารางหรือลิสต์แสดงวัตถุดิบ -->
+                    <div id="ingredientListContainer" class="mt-4 space-y-3 max-h-[480px] overflow-y-auto pr-1">
+                        <!-- โหลดข้อมูลด้วย Javascript -->
+                        <div class="text-center py-8 text-[#8C7A6B]">
+                            <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
+                            <p>กำลังโหลดสต็อกวัตถุดิบ...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-[#E6DFD5] mt-auto py-4 text-center text-xs text-[#8C7A6B]">
+        <p>&copy; 2026 Coffee Shop Management System. All rights reserved.</p>
+    </footer>
+
+    <!-- JavaScript Script -->
+    <script>
+        const API_BASE = "https://coffee-shop-backend-0rnz.onrender.com";
+        let productList = [];
+        let ingredientList = [];
+
+        // โหลดข้อมูลทั้งหมดเมื่อเปิดหน้าเว็บ
+        window.addEventListener('DOMContentLoaded', () => {
+            loadDashboardData();
+        });
+
+        async function loadDashboardData() {
+            await Promise.all([
+                fetchProductsForCloseShop(),
+                fetchIngredientsStatus()
+            ]);
+            updateSummaryCards();
+        }
+
+        // 1. ดึงรายการสินค้ามาแสดงในหน้าปิดร้าน
+        async function fetchProductsForCloseShop() {
+            const container = document.getElementById('closeShopProductList');
+            try {
+                const res = await fetch(`${API_BASE}/api/products`);
+                if (!res.ok) throw new Error('ไม่สามารถโหลดข้อมูลเมนูสินค้าได้');
+                productList = await res.json();
+
+                if (productList.length === 0) {
+                    container.innerHTML = `<p class="text-center text-[#8C7A6B] py-6">ไม่พบรายการสินค้าในระบบ</p>`;
+                    return;
+                }
+
+                let html = '';
+                productList.forEach(p => {
+                    html += `
+                        <div class="flex items-center justify-between p-3 rounded-xl border border-[#E6DFD5] bg-[#FDFBF7] hover:bg-white transition">
+                            <div>
+                                <h4 class="font-bold text-[#4A3525] text-sm">${p.name}</h4>
+                                <p class="text-xs text-[#8C7A6B]">ราคา: ฿${p.price}</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs text-[#8C7A6B] hidden sm:inline">จำนวนแก้ว:</span>
+                                <div class="flex items-center">
+                                    <button type="button" onclick="adjustQty(${p.id}, -1)" class="w-8 h-8 bg-white border border-[#E6DFD5] rounded-l-lg text-[#4A3525] hover:bg-[#E6DFD5]/50 flex items-center justify-center font-bold">-</button>
+                                    <input type="number" id="qty_${p.id}" value="0" min="0" class="w-14 h-8 text-center border-y border-[#E6DFD5] input-custom text-sm font-semibold focus:z-10">
+                                    <button type="button" onclick="adjustQty(${p.id}, 1)" class="w-8 h-8 bg-white border border-[#E6DFD5] rounded-r-lg text-[#4A3525] hover:bg-[#E6DFD5]/50 flex items-center justify-center font-bold">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
                 });
+                container.innerHTML = html;
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = `<p class="text-center text-[#BC4749] py-4">เกิดข้อผิดพลาดในการโหลดเมนูสินค้า</p>`;
             }
+        }
 
-            // โหลดรายการเมนูสำหรับกรอกยอดขาย
-            const resProd = await fetch(`${API_URL}/api/products`);
-            let productListRes = await resProd.json();
-            
-            // ป้องกัน Error กรณีข้อมูลไม่ใช่ Array
-            productList = Array.isArray(productListRes) ? productListRes : (productListRes.data || productListRes.items || []);
+        // ฟังก์ชันช่วยเพิ่ม/ลดจำนวนแก้วด้วยปุ่ม +/-
+        function adjustQty(productId, amount) {
+            const input = document.getElementById(`qty_${productId}`);
+            if (input) {
+                let currentVal = parseInt(input.value) || 0;
+                let newVal = currentVal + amount;
+                if (newVal < 0) newVal = 0;
+                input.value = newVal;
+            }
+        }
 
-            const salesBody = document.getElementById('salesTableBody');
-            salesBody.innerHTML = '';
-            
-            if (productList.length === 0) {
-                salesBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">ยังไม่มีเมนูในระบบ (กรุณาไปเพิ่มเมนูที่หน้า "จัดการเมนูสินค้า")</td></tr>';
+        // 2. ดึงสถานะวัตถุดิบทั้งหมด
+        async function fetchIngredientsStatus() {
+            const container = document.getElementById('ingredientListContainer');
+            const badge = document.getElementById('ingredientCountBadge');
+            try {
+                const res = await fetch(`${API_BASE}/api/ingredients`);
+                if (!res.ok) throw new Error('ไม่สามารถโหลดข้อมูลสต็อกวัตถุดิบได้');
+                ingredientList = await res.json();
+
+                badge.innerText = `${ingredientList.length} รายการ`;
+
+                if (ingredientList.length === 0) {
+                    container.innerHTML = `<p class="text-center text-[#8C7A6B] py-6">ไม่พบวัตถุดิบในระบบ</p>`;
+                    return;
+                }
+
+                let html = '';
+                ingredientList.forEach(ing => {
+                    // สมมติว่ามี max_stock หรือคำนวณเปอร์เซ็นต์ (ถ้าไม่มีค่า max ให้เทียบสัดส่วนคร่าวๆ หรือใช้ค่าน้อยกว่าเกณฑ์เตือน)
+                    // สมมติเกณฑ์เตือนหมดสต็อก/ใกล้หมด: stock <= 20
+                    const isLow = ing.stock <= 20; 
+                    const barColor = isLow ? 'bg-[#BC4749]' : 'bg-[#2D6A4F]';
+                    
+                    html += `
+                        <div class="p-3.5 rounded-xl border border-[#E6DFD5] bg-[#FDFBF7] space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-sm text-[#4A3525]">${ing.name}</span>
+                                <span class="text-xs font-semibold px-2 py-0.5 rounded-md ${isLow ? 'bg-[#BC4749]/10 text-[#BC4749]' : 'bg-[#2D6A4F]/10 text-[#2D6A4F]'}">
+                                    ${ing.stock} ${ing.unit}
+                                </span>
+                            </div>
+                            <!-- หลอดแสดงสถานะเปอร์เซ็นต์ (จำกัด max ไว้ที่ 100 หรือปรับตามจริง) -->
+                            <div class="w-full bg-[#E6DFD5] h-2 rounded-full overflow-hidden">
+                                <div class="${barColor} h-full rounded-full" style="width: ${Math.min(ing.stock, 100)}%;"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = `<p class="text-center text-[#BC4749] py-4">เกิดข้อผิดพลาดในการโหลดวัตถุดิบ</p>`;
+            }
+        }
+
+        // 3. คำนวณสรุปตัวเลขบนการ์ดด้านบน (ยอดขายรวม, จำนวนแก้วรวม, สต็อกเหลือน้อย)
+        function updateSummaryCards() {
+            let totalCups = 0;
+            let totalSales = 0;
+
+            productList.forEach(p => {
+                const input = document.getElementById(`qty_${p.id}`);
+                const qty = input ? (parseInt(input.value) || 0) : 0;
+                totalCups += qty;
+                totalSales += qty * (p.price || 0);
+            });
+
+            document.getElementById('summaryTotalCups').innerText = `${totalCups} แก้ว`;
+            document.getElementById('summaryTotalSales').innerText = `฿${totalSales.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+            // นับจำนวนวัตถุดิบที่ใกล้หมด (<= 20)
+            const lowStockCount = ingredientList.filter(ing => ing.stock <= 20).length;
+            document.getElementById('summaryLowStock').innerText = `${lowStockCount} รายการ`;
+        }
+
+        // เพิ่ม Event Listeners คอยอัปเดตการ์ดสรุปยอดขายทันทีเมื่อมีการกรอกตัวเลข
+        document.addEventListener('input', (e) => {
+            if (e.target && e.target.id && e.target.id.startsWith('qty_')) {
+                updateSummaryCards();
+            }
+        });
+
+        // 4. ฟังก์ชันยืนยันปิดร้านและส่งข้อมูลตัดสต็อกไป Backend
+        function confirmCloseShop() {
+            Swal.fire({
+                title: 'ยืนยันการปิดร้าน?',
+                text: "ระบบจะทำการหักวัตถุดิบตามจำนวนแก้วที่ขายได้จริงในวันนี้ คุณต้องการดำเนินการต่อหรือไม่?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#4A3525',
+                cancelButtonColor: '#BC4749',
+                confirmButtonText: 'ใช่, ยืนยันปิดร้าน',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    executeCloseShop();
+                }
+            });
+        }
+
+        async function executeCloseShop() {
+            const msg = document.getElementById('closeShopMsg');
+            msg.style.color = 'var(--text-muted)';
+            msg.innerText = 'กำลังประมวลผลการปิดร้าน...';
+
+            // รวบรวมข้อมูลสินค้าที่ขายได้
+            const salesData = [];
+            productList.forEach(p => {
+                const input = document.getElementById(`qty_${p.id}`);
+                const qty = input ? (parseInt(input.value) || 0) : 0;
+                if (qty > 0) {
+                    salesData.push({
+                        product_id: p.id,
+                        quantity: qty
+                    });
+                }
+            });
+
+            if (salesData.length === 0) {
+                msg.style.color = 'var(--danger)';
+                msg.innerText = 'กรุณากรอกจำนวนสินค้าที่ขายได้อย่างน้อย 1 รายการ';
+                Swal.fire('แจ้งเตือน', 'กรุณากรอกจำนวนสินค้าที่ขายได้อย่างน้อย 1 รายการ', 'info');
                 return;
             }
 
-            productList.forEach(p => {
-                salesBody.innerHTML += `
-                    <tr>
-                        <td><span style="font-weight: 600;"><i class="fa-solid fa-mug-hot" style="color: var(--primary); margin-right: 6px;"></i> ${p.name}</span></td>
-                        <td><span style="color: var(--primary); font-weight: 600;">${p.price} บาท</span></td>
-                        <td><input type="number" min="0" value="0" id="qty_${p.id}"> แก้ว</td>
-                    </tr>`;
-            });
-        } catch (error) {
-            console.error('โหลดข้อมูลแดชบอร์ดไม่สำเร็จ:', error);
-            Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', 'error');
-        }
-    }
-
-    // ฟังก์ชันคำนวณและแสดงผลสรุปยอดใช้วัตถุดิบ (วันนี้, สัปดาห์นี้, เดือนนี้)
-    async function loadUsageSummary() {
-        try {
-            const res = await fetch(`${API_URL}/api/history/out`);
-            let data = await res.json();
-            
-            if (!Array.isArray(data)) {
-                data = data.data || data.items || [];
-            }
-
-            const now = new Date();
-            const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const weekAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
-            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-
-            let todayMap = {};
-            let weekMap = {};
-            let monthMap = {};
-
-            data.forEach(item => {
-                const itemDate = new Date(item.createdAt || item.date);
-                const ingName = item.Ingredient ? item.Ingredient.name : (item.ingredientName || 'ไม่ระบุ');
-                const unit = item.Ingredient ? item.Ingredient.unit : (item.unit || '');
-                const qty = Number(item.quantity !== undefined ? item.quantity : (item.amount !== undefined ? item.amount : 0));
-
-                if (itemDate >= todayStart) {
-                    if (!todayMap[ingName]) todayMap[ingName] = { name: ingName, unit: unit, qty: 0 };
-                    todayMap[ingName].qty += qty;
-                }
-
-                if (itemDate >= weekAgo) {
-                    if (!weekMap[ingName]) weekMap[ingName] = { name: ingName, unit: unit, qty: 0 };
-                    weekMap[ingName].qty += qty;
-                }
-
-                if (itemDate >= monthStart) {
-                    if (!monthMap[ingName]) monthMap[ingName] = { name: ingName, unit: unit, qty: 0 };
-                    monthMap[ingName].qty += qty;
-                }
-            });
-
-            renderSummaryList('todayList', todayMap);
-            renderSummaryList('weekList', weekMap);
-            renderSummaryList('monthList', monthMap);
-
-        } catch (error) {
-            console.error('โหลดข้อมูลสรุปการใช้วัตถุดิบไม่สำเร็จ:', error);
-            document.getElementById('todayList').innerHTML = '<li><span class="summary-empty" style="color:var(--danger);">โหลดไม่สำเร็จ</span></li>';
-            document.getElementById('weekList').innerHTML = '<li><span class="summary-empty" style="color:var(--danger);">โหลดไม่สำเร็จ</span></li>';
-            document.getElementById('monthList').innerHTML = '<li><span class="summary-empty" style="color:var(--danger);">โหลดไม่สำเร็จ</span></li>';
-        }
-    }
-
-    function renderSummaryList(elementId, mapObj) {
-        const ul = document.getElementById(elementId);
-        ul.innerHTML = '';
-
-        const items = Object.values(mapObj);
-
-        if (items.length === 0) {
-            ul.innerHTML = '<li><span class="summary-empty">ยังไม่มีการใช้วัตถุดิบในช่วงเวลานี้</span></li>';
-            return;
-        }
-
-        items.sort((a, b) => b.qty - a.qty);
-
-        items.forEach(item => {
-            ul.innerHTML += `
-                <li>
-                    <span style="font-weight: 500;">${item.name}</span>
-                    <strong style="color: var(--danger); font-weight: 600;">-${item.qty} ${item.unit}</strong>
-                </li>`;
-        });
-    }
-
-    async function promptCloseShop() {
-        let salesItems = [];
-        productList.forEach(p => {
-            const qtyInput = document.getElementById(`qty_${p.id}`);
-            const qty = qtyInput ? (parseInt(qtyInput.value) || 0) : 0;
-            if(qty > 0) salesItems.push({ productId: p.id, quantity: qty });
-        });
-        
-        if(salesItems.length === 0) {
-            Swal.fire('แจ้งเตือน', 'กรุณากรอกยอดขายอย่างน้อย 1 เมนูก่อนปิดร้าน', 'warning');
-            return;
-        }
-
-        const result = await Swal.fire({
-            title: '⚠️ ยืนยันการปิดร้าน',
-            text: 'ระบบจะทำการตัดสต็อกวัตถุดิบตามสูตรทันที คุณต้องการดำเนินการต่อใช่หรือไม่?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#94a3b8',
-            confirmButtonText: 'ยืนยันปิดร้าน',
-            cancelButtonText: 'ยกเลิก'
-        });
-
-        if (result.isConfirmed) {
-            executeCloseShop(salesItems);
-        }
-    }
-
-    async function executeCloseShop(salesItems) {
-        try {
-            const res = await fetch(`${API_URL}/api/close-shop`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ salesItems })
-            });
-            const data = await res.json();
-            const msg = document.getElementById('message');
-            
-            if(res.ok) { 
-                msg.style.color = 'var(--success)'; 
-                msg.innerText = data.message; 
-                Swal.fire({
-                    icon: 'success',
-                    title: 'ปิดร้านสำเร็จ',
-                    text: data.message,
-                    showConfirmButton: false,
-                    timer: 1500
+            try {
+                // ส่งข้อมูลไปยัง Backend Endpoint (ปรับเปลี่ยน Endpoint ตามจริงของ Backend คุณ เช่น /api/sales/close-shop)
+                const res = await fetch(`${API_BASE}/api/sales/close-shop`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ sales: salesData })
                 });
-                loadDashboardData(); 
-            } else { 
-                msg.style.color = 'var(--danger)'; 
-                msg.innerText = data.error; 
-                Swal.fire('ตัดสต็อกไม่สำเร็จ', data.error || 'เกิดข้อผิดพลาด', 'error');
-            }
-        } catch (e) {
-            console.error('ปิดร้านไม่สำเร็จ', e);
-            Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', 'error');
-        }
-    }
 
-    loadDashboardData();
-</script>
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.error || 'เกิดข้อผิดพลาดในการบันทึกยอดขาย');
+                }
+
+                if(res.ok) { 
+                    msg.style.color = 'var(--success)'; 
+                    msg.innerText = data.message || 'ปิดร้านสำเร็จเรียบร้อยแล้ว'; 
+                    
+                    // รีเซ็ตช่องกรอกตัวเลขทั้งหมดให้กลับเป็น 0
+                    productList.forEach(p => {
+                        const qtyInput = document.getElementById(`qty_${p.id}`);
+                        if (qtyInput) qtyInput.value = 0;
+                    });
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ปิดร้านสำเร็จ',
+                        text: data.message || 'ตัดสต็อกและบันทึกยอดขายเรียบร้อยแล้ว',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+
+                    // โหลดข้อมูล Dashboard ใหม่เพื่ออัปเดตสต็อกล่าสุด
+                    loadDashboardData(); 
+                }
+
+            } catch (error) {
+                console.error(error);
+                msg.style.color = 'var(--danger)';
+                msg.innerText = error.message;
+                Swal.fire('เกิดข้อผิดพลาด', error.message, 'error');
+            }
+        }
+    </script>
 </body>
 </html>
